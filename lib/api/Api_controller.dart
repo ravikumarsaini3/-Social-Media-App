@@ -1,0 +1,67 @@
+import 'package:get/get.dart';
+import 'package:social_media_app/api/api_service.dart';
+import 'package:social_media_app/models/app_data.dart';
+
+import '../exceptions/app_exceptions.dart';
+
+class ApiController extends GetxController {
+  final ApiService _apiService = ApiService();
+
+  RxBool isLoading = false.obs;
+
+  Future<void> fetchPost() async {
+    try {
+      isLoading.value = true;
+     var fetchPostData= await _apiService.fetchPost();
+     AppData().setPost(fetchPostData);
+      isLoading.value = false;
+    } on FetchDataException catch (e) {
+      Get.snackbar(e.toString(), '');
+    } on TimeOutException catch (e) {
+      Get.snackbar(e.toString(), '');
+    } on InvalidResponse catch (e) {
+      Get.snackbar(e.toString(), '');
+    } on BadRequestException catch (e) {
+      Get.snackbar(e.toString(), '');
+    } on InternetException catch (e) {
+      Get.snackbar(e.toString(), '');
+    }
+  }
+
+  Future<void> fetchComments() async {
+    try {
+      isLoading.value = true;
+      var fetchCommentsData= await _apiService.fetchComment();
+      AppData().setComments(fetchCommentsData);
+      isLoading.value = false;
+    } on FetchDataException catch (e) {
+      Get.snackbar(e.toString(), '');
+    } on TimeOutException catch (e) {
+      Get.snackbar(e.toString(), '');
+    } on InvalidResponse catch (e) {
+      Get.snackbar(e.toString(), '');
+    } on BadRequestException catch (e) {
+      Get.snackbar(e.toString(), '');
+    } on InternetException catch (e) {
+      Get.snackbar(e.toString(), '');
+    }
+  }
+  Future<void> fetchUser() async {
+    try {
+      isLoading.value = true;
+      var fetchUserData= await _apiService.fetchUser();
+      AppData().setUser(fetchUserData);
+      isLoading.value = false;
+    } on FetchDataException catch (e) {
+      Get.snackbar(e.toString(), '');
+    } on TimeOutException catch (e) {
+      Get.snackbar(e.toString(), '');
+    } on InvalidResponse catch (e) {
+      Get.snackbar(e.toString(), '');
+    } on BadRequestException catch (e) {
+      Get.snackbar(e.toString(), '');
+    } on InternetException catch (e) {
+      Get.snackbar(e.toString(), '');
+    }
+  }
+}

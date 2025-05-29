@@ -1,0 +1,29 @@
+import 'package:get/get.dart';
+import 'package:social_media_app/models/post_model.dart';
+import 'package:social_media_app/models/comment_model.dart';
+import 'package:social_media_app/models/user_model.dart';
+
+class AppData {
+  AppData._internal();
+  static final AppData instance = AppData._internal();
+  factory AppData() => instance;
+
+  final RxList<PostModel> postList = <PostModel>[].obs;
+  final RxList<CommentModel> commentList = <CommentModel>[].obs;
+  final RxList<UserModel> userList = <UserModel>[].obs;
+
+  void setPost(List<PostModel> post) {
+    postList.assignAll(post);
+  }
+  void setUser(List<UserModel> user) {
+    userList.assignAll(user);
+  }
+
+  void setComments(List<CommentModel> comments) {
+    commentList.assignAll(comments);
+  }
+
+  List<PostModel> getPost() => postList;
+  List<UserModel> getUser() => userList;
+  List<CommentModel> getComments() => commentList;
+}
