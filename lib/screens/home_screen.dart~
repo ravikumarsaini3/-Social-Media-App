@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:social_media_app/models/app_data.dart';
 import 'package:social_media_app/screens/post_details_screen.dart';
 import '../api/Api_controller.dart';
+import '../models/post_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,10 +24,19 @@ class _HomeScreenState extends State<HomeScreen> {
     apiController.fetchUser();
   }
 
+  var titleController = TextEditingController();
+  var bodyController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F5F9),
+      //backgroundColor: const Color(0xFFF4F5F9),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showMySheet();
+        },
+        child: Icon(Icons.add),
+      ),
       appBar: AppBar(
         title: const Text("Posts"),
         centerTitle: true,
@@ -40,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         if (appData.postList.isEmpty) {
-          return const Center(child: Text('No Posts Found'));
+          return const Center(child: Text('No Posts Found',style: TextStyle(fontSize: 20,color: Colors.grey),));
         }
 
         return ListView.builder(
@@ -48,82 +58,160 @@ class _HomeScreenState extends State<HomeScreen> {
           itemCount: appData.postList.length,
           itemBuilder: (context, index) {
             final post = appData.postList[index];
-            return GestureDetector(
-              onTap: () {
-                Get.to(() => const PostDetailsScreen());
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeInOut,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.shade300,
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Post #${post.id}",
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      post.title,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      post.body,
-                      style: TextStyle(
-                        fontSize: 16,
-                        height: 1.4,
-                        color: Colors.grey.shade800,
-                      ),
-                      maxLines: 5,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    const Divider(color: Colors.grey, height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: const [
-                        Icon(Icons.comment_outlined, size: 18, color: Colors.grey),
-                        SizedBox(width: 4),
-                        Text(
-                          "View Comments",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.blueAccent,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
+            return buildPostCard(post);
           },
         );
       }),
+    );
+  }
+
+  void showMySheet() {
+    showModalBottomSheet(
+      isScrollControlled: true,
+
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 26),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: titleController,
+                    decoration: const InputDecoration(
+                      labelText: 'Title',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: bodyController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Body',
+
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 26),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          apiController.addPost(
+                            titleController.text,
+                            bodyController.text,
+                            1,
+                          );
+                          titleController.clear();
+                          bodyController.clear();
+                          Get.back();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Add Post'),
+                      ),
+                      SizedBox(width: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          Get.back();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('cancel'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildPostCard(PostModel post) {
+    return GestureDetector(
+      onTap: () {
+        Get.to(() => const PostDetailsScreen());
+      },
+      child: AnimatedContainer(
+        duration: const Duration(seconds: 1),
+        curve: Curves.easeInOut,
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.shade200,
+              blurRadius: 2,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Post #${post.id}",
+              style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              post.title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              post.body,
+              style: TextStyle(
+                fontSize: 16,
+                height: 1.4,
+                color: Colors.grey.shade800,
+              ),
+              maxLines: 5,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 8),
+            const Divider(color: Colors.grey, height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: const [
+                Icon(Icons.comment_outlined, size: 18, color: Colors.grey),
+                SizedBox(width: 4),
+                Text(
+                  "View Comments",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.blueAccent,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

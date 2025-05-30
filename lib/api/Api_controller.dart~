@@ -22,7 +22,7 @@ class ApiController extends GetxController {
         'Post added successfully',
         duration: Duration(seconds: 2),
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.green.shade200,
+        backgroundColor: Colors.green.shade100,
         animationDuration: Duration(seconds: 1),
       );
 

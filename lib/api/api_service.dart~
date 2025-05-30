@@ -29,11 +29,10 @@ class ApiService {
       );
       if (response.statusCode == 201) {
         return PostModel.fromJson(response.data);
-
+      
       }
       else{
-        throw InvalidResponse("Failed to add post");
-
+        Get.snackbar('Error', 'Failed to add post');
       }
     } on DioException catch (e) {
       return Future.error(_handleError(e));
